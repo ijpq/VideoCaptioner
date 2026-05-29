@@ -6,6 +6,7 @@ import openai
 
 from videocaptioner.config import ASSETS_PATH
 from videocaptioner.core.llm.client import normalize_base_url
+from videocaptioner.core.llm.request_logger import create_clean_http_client
 
 # 测试音频文件路径
 TEST_AUDIO_PATH = ASSETS_PATH / "en.mp3"
@@ -35,7 +36,8 @@ def check_whisper_connection(
         # 创建 OpenAI 客户端
         base_url = normalize_base_url(base_url)
         api_key = api_key.strip()
-        client = openai.OpenAI(base_url=base_url, api_key=api_key, timeout=60)
+        client = openai.OpenAI(base_url=base_url, api_key=api_key, timeout=60,
+                               http_client=create_clean_http_client())
 
         # Reading音频文件
         with open(TEST_AUDIO_PATH, "rb") as audio_file:

@@ -80,11 +80,25 @@ def _on_response(response: httpx.Response) -> None:
 # ==================== 公开 API ====================
 
 
+def _strip_sdk_fingerprint(request: httpx.Request) -> None:
+    """Remove OpenAI Python SDK fingerprinting headers blocked by some proxy servers."""
+    request.headers["user-agent"] = "python-httpx"
+    for key in [k for k in request.headers.keys() if k.lower().startswith("x-stainless")]:
+        del request.headers[key]
+
+
+def create_clean_http_client() -> httpx.Client:
+    """创建去除 OpenAI SDK 特征头的 HTTPX 客户端（用于连接检测和兼容性代理）"""
+    return httpx.Client(
+        event_hooks={"request": [_strip_sdk_fingerprint]}
+    )
+
+
 def create_logging_http_client() -> httpx.Client:
     """创建带日志记录的 HTTPX 客户端"""
     return httpx.Client(
         event_hooks={
-            "request": [_on_request],
+            "request": [_strip_sdk_fingerprint, _on_request],
             "response": [_on_response],
         }
     )
