@@ -5,6 +5,7 @@ from typing import Literal, Optional
 import openai
 
 from videocaptioner.core.llm.client import normalize_base_url
+from videocaptioner.core.llm.request_logger import create_clean_http_client
 
 
 def check_llm_connection(
@@ -27,7 +28,8 @@ def check_llm_connection(
         base_url = normalize_base_url(base_url)
         api_key = api_key.strip()
         response = openai.OpenAI(
-            base_url=base_url, api_key=api_key, timeout=60
+            base_url=base_url, api_key=api_key, timeout=60,
+            http_client=create_clean_http_client(),
         ).chat.completions.create(
             model=model,
             messages=[
@@ -65,7 +67,8 @@ def get_available_models(base_url: str, api_key: str) -> list[str]:
         base_url = normalize_base_url(base_url)
         # 创建OpenAI客户端并获取模型列表
         models = openai.OpenAI(
-            base_url=base_url, api_key=api_key, timeout=5
+            base_url=base_url, api_key=api_key, timeout=5,
+            http_client=create_clean_http_client(),
         ).models.list()
 
         # 去除非文本模型

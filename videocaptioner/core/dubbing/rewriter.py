@@ -5,6 +5,7 @@ from typing import Iterable
 
 from openai import OpenAI
 
+from videocaptioner.core.llm.request_logger import create_clean_http_client
 from videocaptioner.core.utils.text_utils import is_mainly_cjk
 
 from .models import DubbingConfig, DubbingSegment
@@ -34,7 +35,8 @@ def rewrite_segments_if_needed(segments: Iterable[DubbingSegment], config: Dubbi
     if not targets:
         return
 
-    client = OpenAI(api_key=config.llm_api_key, base_url=config.llm_api_base)
+    client = OpenAI(api_key=config.llm_api_key, base_url=config.llm_api_base,
+                    http_client=create_clean_http_client())
     payload = [
         {
             "index": seg.index,

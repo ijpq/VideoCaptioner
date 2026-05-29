@@ -3,6 +3,7 @@ from typing import Any, Callable, List, Optional, Union
 from openai import OpenAI
 
 from videocaptioner.core.llm.client import normalize_base_url
+from videocaptioner.core.llm.request_logger import create_clean_http_client
 
 from ..utils.logger import setup_logger
 from .asr_data import ASRDataSeg
@@ -53,7 +54,8 @@ class WhisperAPI(BaseASR):
         self.prompt = prompt
         self.need_word_time_stamp = need_word_time_stamp
 
-        self.client = OpenAI(base_url=self.base_url, api_key=self.api_key)
+        self.client = OpenAI(base_url=self.base_url, api_key=self.api_key,
+                             http_client=create_clean_http_client())
 
     def _run(
         self, callback: Optional[Callable[[int, str], None]] = None, **kwargs: Any
